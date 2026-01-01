@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Property - MayraPro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="main-header">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-city"></i> Mayra <span>Property</span>
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="index.html#buy" class="nav-link">Buy</a></li>
+                <li><a href="index.html#rent" class="nav-link">Rent</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+
+            
+            </div>
+
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <div class="form-container">
+        <h2>List Your Property</h2>
+        <form id="postForm">
+            <input type="text" id="title" placeholder="Property Title (e.g. 3 BHK Flat in Gota)" required>
+            <select id="location" required>
+                <option value="">Select Area</option>
+                <option value="Nikol">Nikol</option>
+                <option value="Naroda">Naroda</option>
+                <option value="muthiya">muthiya</option>
+                <option value="Odhav">Odhav</option>
+                <option value="vatva">vatva</option>
+                <option value="Gota">Gota</option>
+            </select>
+            <select id="type" required>
+                <option value="Flat">Flat</option>
+                <option value="Land">Land</option>
+                <option value="House">House</option>
+                <option value="Commercial">Commercial</option>
+            </select>
+            <input type="number" id="price" placeholder="Price (₹)" required>
+            <input type="tel" id="mobile" placeholder="Mobile Number" required>
+            <label>Upload Property Photo:</label>
+            <input type="file" id="imageInput" accept="image/*" required>
+            <button type="submit" id="submitBtn">Submit Property</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { db, collection, addDoc } from './js/firebase-config.js';
+
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Uploading to Cloud...";
+            btn.disabled = true;
+
+            const file = document.getElementById('imageInput').files[0];
+            const reader = new FileReader();
+            
+            reader.readAsDataURL(file); // Convert image to Base64 string
+            reader.onload = async () => {
+                try {
+                    await addDoc(collection(db, "properties"), {
+                        title: document.getElementById('title').value,
+                        location: document.getElementById('location').value,
+                        type: document.getElementById('type').value,
+                        price: document.getElementById('price').value,
+                        mobile: document.getElementById('mobile').value,
+                        image: reader.result,
+                        timestamp: Date.now()
+                    });
+                    alert("Property Uploaded Successfully!");
+                    window.location.href = "index.html";
+                } catch (err) {
+                    alert("Error: " + err.message);
+                    btn.disabled = false;
+                    btn.innerText = "Submit Property";
+                }
+            };
+        });
+    </script>
+</body>
+</html>
